@@ -1,0 +1,123 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Dokuwiki - Kocaeli Üniversitesi\\
+{\footnotesize \textsuperscript{}}
+\thanks{}
+}
+
+\author{\IEEEauthorblockN{Göksel OKANDAN}
+\IEEEauthorblockA{\textit{Bilgisayar Mühendisliği} \\
+\textit{Kocaeli Üniversitesi}\\
+Kocaeli, Türkiye \\
+210201058@uzem.education}
+}
+
+\maketitle
+
+\begin{abstract}
+Bu döküman Kocaeli Üniversitesi, Bilgisayar Mühendisliği Fakültesi, Programlama Laboratuvarı dersinin 1. projesi olan DokuWiki - Kocaeli Üniversitesi projesinin raporudur. Bu dökümanda projenin özeti, tanımı, çözüme yönelik yapılan araştırmalar, kullanılan yöntemler ve algoritmalar, projenin hazırlanmasında kullanılan geliştirme ortamı hakkında bilgiler, karşılaşılan sorunlar gibi program hakkında bilgiler bulunmaktadır.
+\end{abstract}
+
+\begin{IEEEkeywords}
+dosya okuma, dosya yazma, ders, bölüm, arama, güncelleme, yazma
+\end{IEEEkeywords}
+
+\section*{Özet}
+Bu döküman Kocaeli Üniversitesi, Bilgisayar Mühendisliği Fakültesi, Programlama Laboratuvarı dersinin 1. projesi olan DokuWiki - Kocaeli Üniversitesi projesinin raporudur. Bu dökümanda projenin özeti, tanımı, çözüme yönelik yapılan araştırmalar, kullanılan yöntemler ve algoritmalar, projenin hazırlanmasında kullanılan geliştirme ortamı hakkında bilgiler, karşılaşılan sorunlar gibi program hakkında bilgiler bulunmaktadır.
+
+\section*{Giriş}
+Projenin adı Dokuwiki - Kocaeli Üniversitesi'dir. Bu proje ile bir veri tabanı kullanmadan üniversitede bulunan bölümleri ve bölümlerde
+okutulan derslerin içeriklerini gösteren bir uygulama oluşturulması amaçlanmıştır.
+
+DokuWiki Nedir?
+
+DokuWiki, GPLv2 lisansı altında bulunan, PHP programlama dili ile yazılmış olan, herhangi bir veritabanı gerektirmeyen bir wiki uygulamasıdır [1]. 2004 yılında Andreas Gohr tarafından oluşturulmuştur [2]. Wiki programları, siteye farklı insanların katkıda bulunmasını sağlayabilen, öncelikleri bilgileri saklayabilmek ve onları yönetebilmeyi mümkün kılmak olan programlardır [3].
+
+DokuWiki'nin diğer wiki programlarına göre farkı herhangi bir veritabanına ihtiyaç duymamasıdır. DokuWiki'de tüm bilgiler PHP dosyalarında saklanmakta olup, bu durum wiki sitesinin performansını geliştirmektedir [4].
+
+En başta DokuWiki, wiki syntaxını HTML'e çevirmek için kullanılmıştır. Ocak 2005'te Harry Fuecks'in katkısı ile yeniden dizayn edilen parser ve renderer mekanizmalarının geliştirilmesi ile DokuWiki'nin gelişimnde büyük bir adım atılmıştır [5]. Yeni dizaynda PHP4 ile tanıtılan bazı obje odaklı özellikler kullanılmıştır. Yeni dizayn ve eklenen önbellek sistemi sayesinde perfomans gelişimi sağlanmış, bu da DokuWiki'nin daha büyük projeler için kullanılabilmesine yol açmıştır [6].
+
+Yeni (parser) aynı zamanda DokuWiki'de syntax'a dayalı eklentilerin geliştirilmesini ve bakımlarının yapılmasını basitleştiren bir eklenti arayüzünün geliştirilmesini sağlamıştır. İlerleyen zamanlarda 3. parti geliştiriciler, eklentiler geliştirip Wiki'nin özelliklerinin geliştirlmesine katkıda bulunmuşlardır [7].
+
+C programlama dili ile yazılan bu proje aynı DokuWiki gibi bir veritabanına ihtiyaç duymadan bir klasör içerisindeki .txt dosyaları sayesinde işlemlerini gerçekleştirebilmektedir.
+
+Proje C dili ile yazılmış olup en başta belli eklentilerle C dilini compile edebilir hale getirilen bir Visual Studio Code versiyonu ile geliştirilmiş olup bazı problemler sonrasında Dev C++ IDE'sine geçiş yapılarak geliştirilmiştir. Programda klasör işlemlerinin gerçekleştirilebilmesi için "dirent.h"[8], Türkçe karakter kullanılabilmesi için "locale.h", string işlemlerinin gerçekleştirilebilmesi için "string.h" kütüphaneleri kullanılmıştır.
+
+Yapılan program bir menü aracılığıyla arama yapabilmeli, etiket güncelleyebilmeli ve çıktıları dosyaya yazdırabilmelidir.
+\section*{Yöntem}
+\begin{itemize}
+    \item Programda istenen eylemleri gerçekleştirmek için bir menü tasarlanmış olup, bir işlem değişkeni kullanılarak istenen işlemlerin yapılması sağlanmakta, çıkış yapılması istenene kadar program çıkış yapmamaktadır.
+    
+    \item Arama gerçekleştirilirken kullanıcıdan bir kelime dizisi alınıp bu kelime dizisi bir etikete ve dosya adına çevrilerek aratılmaktadır. ConvertToTagForSearch fonksiyonu kelime dizisinin başına "[[" ve sonuna "]]" ekleyerek etiket formuna çevirmektedir. Kelime dosya adına ise ConvertToFilenameforSearch fonksiyonu kullanılarak boşlukları alt çizgi karakterine çevrilerek ve sonuna ".txt" eklenerek çevirilmektedir. Bundan sonra SearchForTag ve SearchforFilename fonksiyonları kullanılır. SearchForTag fonksiyonu tüm dosyaların içerikleri allcontent adlı bri string'e atamaktadır. Bu string içerisinde imlecin olduğu yer okunarak etiket bulunmaya çalışılmaktadır. SearchforFilename fonksiyonu ise bölümler ve dersler klasörlerinin içindeki dosya adlarını bir string dizisine kaydetmekte, ConvertToFilenameForSearch fonksiyonundan elde edilen dosya adı bu string'de bulunan dosya adları ile karşılaştırılmaktadır. Bu duruma göre etiket cinsi (normal, yetim, istenen) belli olduktan sonra dosyalar içerisinde SearchWithinFiles fonksiyonu ile arama yapılmaktadır.
+    
+    \item Güncelleştirme işlemi gerçekleştirilirken ilk olarak kullanıcıdan değiştirilmesi istenen etiket, sonra ise yeni etiket etiket formatında (başında "[[" ve sonunda "]]" karakterleri olmak üzere) alınmaktadır. Daha sonra yeni etiket dosya adı formatı kullanılarak yeni dosya adına çevirilir. Daha sonra yeni olarak oluşturulmuş yetim etiketin yeni dosya adı kullanılarak dosyası oluşturulur. Derskodu altında yeni oluşturulan derse 200'den başlamak üzere bir kod atanır. Dosyanın içine dersin kodu, adı ve içeriği program tarafından yerleştirilmekte, kullanıcı bu ... (dersin adı hariç olmak üzere)istediği gibi değiştirebilmektedir. Bu durumdan sonra derskodu 1 arttırlır ve program kapatılana kadar artmış durumda kalmaktadır (program kapatıldığında 200'e geri dönmektedir).
+    
+    \item Dosyaya yazma kısmında ise öncelikle tüm dosyaların içerikleri bir string'e atanmakta ve bu string'te etiketler belirlenmektedir. Etiketler belirlendikten sonra etiketlerin tekrar sayıları belirlenmektedir. Daha sonra ise string'lerin yetim etiket olup olmadığı CheckIfOrphan fonksiyonu kullanılarak belirlenmekete, yetim etiket olup olmamalarına göre kendilerine ait string dizilerine atanmaktadırlar. Daha sonrasında ise normal etiketler tekrar sayıları ile güncel etiket listesi olarak, yetim etiketler ise yetim etiketler listesi olarak dosyaya yazdırılmaktadırlar. Aynı zamanda dosyanın eski listesinin korunabilmesi için dosya append formunda açılmıştır. Güncel liste dosyanın en sonundaki listedir. Güncel dosya başlığının doğru zamanda yazdırılabilmesi için dosyanın içinde herhangi bir içerik olup olmadığını belirleyebilecek bir kod parçası da programa dahil edilmiştir.
+    
+    \item Arama yapılırken ve dosyaya yazma işlemi gerçekleştirilirken "dirent.h" kütüphanesi kullanılmış olup, dosya güncelleme işlemi gerçekleştirilirken "dirent.h" kütüphanesi kullanılmamış, dosya yolları unilessonpath ve uniclasspath string'lerine atanarak belirlenmiştir.
+    
+    \item Programın Türkçe karakter girişini kabul etmesi için "locale.h" kütüphanesi ile setlocale() komutu kullanılmış ancak en başta Visual Studio Code'un Türkçe karakterlerde koda dahil edilen komutlarda sorun çıkartması (konsol ekranında Türkçe karakterlerin bozulması ve okunamaması) sonrasında Dev C++'a geçiş yapılarak problemin çözümünde kısmi olarak başarılı olunabilmiştir. Program konsolda Türkçe karakter yazdırabilmekte ve okuyabilmekte ancak klavyeden Türkçe karakter girişinde karakterleri değiştirmekte ve programın istenildiği gibi çalışmasına engel olmaktadır.
+    
+    \item Program 300 satırdan oluşmaktadır.
+\end{itemize}
+
+\section*{Deneysel Sonuçlar}
+\begin{itemize}
+    \item Programın menüsü istendiği gibi çalışmakta olup, yalnızca integer dışında bir değer girildiğinde program sonsuz döngüye girerek çökmektedir. Buna herhangi bir çözüm bulunamamıştır.
+    
+    \item Programın arama işlem gerçekleşirken kelime alımında bir sorun yaşanmamaktadır. 
+    
+    \item Aranacak etiket ve dosya yolu oluşturma fonksiyonlarından herhangi birisinde bir sorun gerçekleşmemektedir. Etiket arama fonksiyonu belirlenememiş nedenlerden ötürü her zaman  bir etiketin bulunduğu değerini geri göndermektedir.
+    
+    \item Aynı zamanda dosya arama fonksiyonu ise yeniden belirlenememiş nedenlerden ötürü her zaman bir dosyanın bulunamadğını göndermektedir.
+    
+    \item Bu nedenle girilen arama fonksiyonu girilen her aramayı yetim etiket olarak algılamakta ve alınan çıktı yanlış olmaktadır.
+    
+    \item Aynı zamanda SearchWithinFiles fonksiyonu eklenmeye çalışılmış, ancak programın çalışmasında sorunlar oluşunca programdan geçici olarak kaldırılmıştır. SearchWithinFiles fonksiyonu proje teslim tarihine kadar program ile sağlıklı bir şekilde çalışabilecek hale getirilemediği nedeniyle programda bulunmamakta, bu yüzden arama fonksiyonunda yalnızca etiket cinsi ve etiket olarak bulunup bulunamadığı bilgisi kullanıcıya verilebilmektedir.
+    
+    \item Programın güncelleştirme işlemi ise yeni dosya oluşturma işini başarı ile gerçekleştirmekte olup, dosyalar içerisindeki etiketleri güncelleştirme fonksiyonunu barındırmadğından dosyalar içerisindeki etiketleri değiştirememektedir.
+    
+    \item Programın dosyaya yazma işlemi, gerekli kodun eksikliği yüzünden sadece yeni dosya oluşturup, bu dosyanın içine başlıkları yazdırabilmektedir.
+    
+    \item Program ekrana Türkçe karakterler yazdırabiliyor ve dosyalardan Türkçe karakterler okuyabiliyor olsa da kullanıcıdan içinden Türkçe karakter bulundran girdiler, Türkçe karakterlerin karakter değişimine uğraması ile sonuçlanmaktadır.
+\end{itemize}
+
+\section*{Sonuç}
+Bu projede gösterildiği gibi C dilinde de DokuWiki gibi herhangi bir veritabanına ihtiyaç duymadan wiki benzeri bir uygulama yapılabilmektedir.
+\section*{Kaynakça}
+
+\begin{thebibliography}{0}
+\bibitem{b1} https://en.wikipedia.org/wiki/DokuWiki
+\bibitem{b2} https://doc.ubuntu-fr.org/dokuwiki
+\bibitem{b3} https://www.inmotionhosting.com/support/edu/dokuwiki/what-is-doku/
+\bibitem{b4} https://www.inmotionhosting.com/support/edu/dokuwiki/what-is-doku/
+\bibitem{b5} https://www.sitepoint.com/oop-and-performance/
+\bibitem{b6} https://en.wikipedia.org/wiki/DokuWiki
+\bibitem{b7} https://www.dokuwiki.org/devel:plugins
+\bibitem{b8} https://www.tutorialspoint.com/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-cplusplus
+\end{thebibliography}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=1.4]{Program Akış Şeması.png}}
+\caption{Programın Genel Akış Şeması}
+\label{Genel Akış Diyagramı}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=1.5]{Yetim ve İstenen Etiket Akış Şeması.png}}
+\caption{Yetim ve İstenen Etiketin Akış Şeması.}
+\label{Etiket Akış Diyagramı}
+\end{figure}
+
+\end{document}*
